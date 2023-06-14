@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using System.Threading.Tasks;
-
-using Microsoft.Extensions.Configuration;
 
 namespace Tgs.GameRecord.ManualConsole;
 
@@ -25,7 +19,7 @@ internal class ConfigurationService : IConfigurationService
         var index = 1;
         foreach (var jsonObject in jsonObjects)
         {
-            options.AppendLine($"({index}).{jsonObject["BrandCode"]}");
+            _ = options.AppendLine($"({index}).{jsonObject["BrandCode"]}");
             index++;
         }
 
@@ -34,7 +28,10 @@ internal class ConfigurationService : IConfigurationService
         Console.Write("選擇BrandCode:");
 
         var optionIndex = Convert.ToInt32(Console.ReadLine() ?? throw new NullReferenceException());
+        var optionJsonObjects = jsonObjects.ElementAt(optionIndex - 1);
+        Console.WriteLine("Configuration:{0}", optionJsonObjects);
+        Console.WriteLine();
 
-        return jsonObjects.ElementAt(optionIndex - 1);
+        return optionJsonObjects;
     }
 }

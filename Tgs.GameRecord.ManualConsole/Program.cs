@@ -1,4 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
+using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -14,57 +15,66 @@ builder.Configuration
 
 builder.Services.AddTransient<IGameProvidersService, GameProvidersService>();
 builder.Services.AddTransient<IConfigurationService, ConfigurationService>();
+builder.Services.AddTransient<ITimeRangeService, TimeRangeService>();
+builder.Services.AddTransient<IDateModesService, DateModesService>();
 builder.Services.AddTransient<IDateTypesService, DateTypesService>();
+builder.Services.AddTransient<ITimeIntervalsService, TimeIntervalsService>();
 builder.Services.AddHttpClient<IGameApiClient, GameApiClient>();
 var app = builder.Build();
 
 var gameProvidersService = app.Services.GetRequiredService<IGameProvidersService>();
 var gameProvidersOptions = builder.Configuration.GetSection("GameProviders").Get<IEnumerable<GameProvidersOperator>>()!;
-var gameProviders = gameProvidersService.Get(gameProvidersOptions);
-Console.WriteLine("Game Provider Code:{0}", gameProviders);
+var gameProvider = gameProvidersService.Get(gameProvidersOptions);
 
 var configurationService = app.Services.GetRequiredService<IConfigurationService>();
 var configuration = await configurationService
     .GetAsync(
-    gameProviders.JsonFile)
+    gameProvider.JsonFile)
     .ConfigureAwait(false);
-Console.WriteLine("configuration:{0}", configuration);
 
-Console.Write("日期(yyyy-MM-dd):");
-var dateTime = Convert.ToDateTime(Console.ReadLine() ?? throw new NullReferenceException());
+var dateModesService = app.Services.GetRequiredService<IDateModesService>();
+var dateMode = dateModesService.Get();
+
+var timeRangeService = app.Services.GetRequiredService<ITimeRangeService>();
+(DateTimeOffset StartTime, DateTimeOffset EndTime) = timeRangeService.Get(dateMode);
 
 var dateTypesOperators = builder.Configuration.GetSection("DataTypes").Get<IEnumerable<DateTypesOperator>>()!;
 var dateTypesService = app.Services.GetRequiredService<IDateTypesService>();
-var dateTypes = dateTypesService.Get(dateTypesOperators);
-Console.WriteLine("date type:{0}", dateTypes);
+var dateType = dateTypesService.Get(dateTypesOperators);
 
-var _timeZone = TimeZoneInfo.FindSystemTimeZoneById("Taipei Standard Time");
-var startTime = new DateTimeOffset(dateTime, _timeZone.GetUtcOffset(dateTime));
-var endTime = startTime.AddDays(1);
+var timeIntervalsOperators = builder.Configuration.GetSection("TimeIntervals").Get<IEnumerable<TimeIntervalsOperator>>()
+    ?? new TimeIntervalsOperator[]{
+        new TimeIntervalsOperator
+        {
+            Name="每30秒",
+            Seconds=30
+        }
+    };
+var timeIntervalsService = app.Services.GetRequiredService<ITimeIntervalsService>();
+var timeInterval = timeIntervalsService.Get(timeIntervalsOperators);
+
 var client = app.Services.GetRequiredService<IGameApiClient>();
 while (true)
 {
-    if (startTime.CompareTo(endTime) >= 0)
+    if (StartTime.CompareTo(EndTime) >= 0)
     {
         break;
     }
     var data = configuration;
-    var tempStartTime = startTime;
-    var tempEndTime = startTime.AddSeconds(dateTypes.Seconds);
+    var tempStartTime = StartTime;
+    var tempEndTime = StartTime.AddSeconds(dateType.Seconds);
     data["startTime"] = tempStartTime;
     data["endTime"] = tempEndTime;
 
     var httpStatusCode = await client
         .PostAsync(
              builder.Configuration.GetSection("ServiceUrl").Get<Uri>()!,
-             gameProviders.Path,
+             gameProvider.Path,
             data)
         .ConfigureAwait(false);
 
     Console.WriteLine($"時間:{DateTime.Now:O} 區間:{tempStartTime:O}~{tempEndTime:O} HttpStatus:{httpStatusCode}");
-    startTime = startTime.AddSeconds(dateTypes.Seconds);
+    StartTime = StartTime.AddSeconds(dateType.Seconds);
 
-    await Task.Delay(TimeSpan.FromSeconds(30)).ConfigureAwait(false);
-
-
+    await Task.Delay(TimeSpan.FromSeconds(timeInterval.Seconds)).ConfigureAwait(false);
 }

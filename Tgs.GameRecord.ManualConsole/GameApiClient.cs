@@ -8,11 +8,11 @@ namespace Tgs.GameRecord.ManualConsole;
 
 internal class GameApiClient : IGameApiClient
 {
-    private readonly HttpClient httpClient;
+    private readonly HttpClient _httpClient;
 
     public GameApiClient(HttpClient httpClient)
     {
-        this.httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+        this._httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
     }
 
     public async ValueTask<HttpStatusCode> PostAsync(
@@ -22,7 +22,7 @@ internal class GameApiClient : IGameApiClient
         CancellationToken cancellationToken = default)
     {
         var content = new StringContent(JsonSerializer.Serialize(source), Encoding.UTF8, MediaTypeNames.Application.Json);
-        var httpResponseMessage = await httpClient
+        var httpResponseMessage = await _httpClient
             .PostAsync(
                 requestUri: new Uri(serviceUrl, pathUrl),
                 content: content,

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 
 using Tgs.GameRecord.ManualConsole.Operators;
 
@@ -16,7 +12,7 @@ internal class DateTypesService : IDateTypesService
         var index = 1;
         foreach (var dateType in dateTypes)
         {
-            options.AppendLine($"({index}).{dateType.Name}");
+            _ = options.AppendLine($"({index}).{dateType.Name}");
             index++;
         }
         Console.WriteLine(options);
@@ -25,6 +21,9 @@ internal class DateTypesService : IDateTypesService
 
         var optionIndex = Convert.ToInt32(Console.ReadLine() ?? throw new NullReferenceException());
 
-        return dateTypes.ElementAt(optionIndex - 1);
+        var optionDateType = dateTypes.ElementAt(optionIndex - 1);
+        Console.WriteLine("Date Type:{0}", optionDateType);
+        Console.WriteLine();
+        return optionDateType;
     }
 }
