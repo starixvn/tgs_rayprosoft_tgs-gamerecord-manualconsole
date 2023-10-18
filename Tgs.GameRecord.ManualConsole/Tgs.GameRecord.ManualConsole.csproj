@@ -12,11 +12,15 @@
 	  <None Remove="appsettings.jdbtf.json" />
 	  <None Remove="appsettings.joker.json" />
 	  <None Remove="appsettings.json" />
+	  <None Remove="appsettings.obet.json" />
 	  <None Remove="appsettings.wgfm.json" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <EmbeddedResource Include="appsettings.jdbtf.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </EmbeddedResource>
+	  <EmbeddedResource Include="appsettings.obet.json">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </EmbeddedResource>
 	  <EmbeddedResource Include="appsettings.wgfm.json">
