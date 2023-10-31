@@ -8,6 +8,9 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <None Remove="appsettings.awc.cockfight.json" />
+	  <None Remove="appsettings.awc.fs.json" />
+	  <None Remove="appsettings.awc.km.json" />
 	  <None Remove="appsettings.evotf.json" />
 	  <None Remove="appsettings.jdbtf.json" />
 	  <None Remove="appsettings.joker.json" />
@@ -17,6 +20,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <EmbeddedResource Include="appsettings.awc.cockfight.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </EmbeddedResource>
+	  <EmbeddedResource Include="appsettings.awc.fs.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </EmbeddedResource>
+	  <EmbeddedResource Include="appsettings.awc.km.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </EmbeddedResource>
 	  <EmbeddedResource Include="appsettings.jdbtf.json">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </EmbeddedResource>
