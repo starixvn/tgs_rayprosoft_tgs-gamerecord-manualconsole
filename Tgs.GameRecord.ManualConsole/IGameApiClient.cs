@@ -5,9 +5,5 @@ namespace Tgs.GameRecord.ManualConsole;
 
 public interface IGameApiClient
 {
-    public ValueTask<HttpStatusCode> PostAsync(
-        Uri serviceUrl,
-        string pathUrl,
-        JsonObject source,
-        CancellationToken cancellationToken = default);
+    ValueTask<HttpStatusCode> PostAsync(Uri serviceUrl, string pathUrl, JsonObject source, CancellationToken cancellationToken = default);
 }

@@ -43,8 +43,7 @@ var dateType = dateTypesService.Get(dateTypesOperators);
 
 var timeIntervalsOperators = builder.Configuration.GetSection("TimeIntervals").Get<IEnumerable<TimeIntervalsOperator>>()
     ?? new TimeIntervalsOperator[]{
-        new TimeIntervalsOperator
-        {
+        new() {
             Name="每30秒",
             Seconds=30
         }
@@ -65,11 +64,10 @@ while (true)
     data["startTime"] = tempStartTime;
     data["endTime"] = tempEndTime;
 
-    var httpStatusCode = await client
-        .PostAsync(
-             builder.Configuration.GetSection("ServiceUrl").Get<Uri>()!,
-             gameProvider.Path,
-            data)
+    var httpStatusCode = await client.PostAsync(
+        serviceUrl: builder.Configuration.GetSection("ServiceUrl").Get<Uri>()!,
+        pathUrl: gameProvider.Path,
+        source: data)
         .ConfigureAwait(false);
 
     Console.WriteLine($"時間:{DateTime.Now:O} 區間:{tempStartTime:O}~{tempEndTime:O} HttpStatus:{httpStatusCode}");
